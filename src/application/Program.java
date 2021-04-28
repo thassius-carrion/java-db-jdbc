@@ -32,8 +32,8 @@ public class Program {
 			e.printStackTrace();
 		}
 		finally {
-			DB.closeRs();
-			DB.closeSt();
+			DB.closeRs(rs);
+			DB.closeSt(st);
 			DB.closeConnection();
 		}
 
