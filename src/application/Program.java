@@ -1,10 +1,10 @@
 package application;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 import db.DB;
 
@@ -12,30 +12,41 @@ public class Program {
 
 	public static void main(String[] args) {
 		
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 		Connection conn = null;
-		Statement st = null;
-		ResultSet rs = null;
+		
+		PreparedStatement st = null;
 		
 		try {
 			conn = DB.getConnection();
 			
-			st = conn.createStatement();
+			st = conn.prepareStatement(
+					"INSERT INTO seller "
+					+ "(Name, Email, BirthDate, BaseSalary, DepartmentId) "
+					+ "VALUES "
+					+ "(?, ?, ?, ?, ?)");
 			
-			rs = st.executeQuery("select * from department"); //comando SQL, o resultado da consulta por st, estou adicionando no resultSet
+			st.setString(1, "Karl Purple");
+			st.setString(2, "karl@gmail.com");
+			st.setDate(3, new java.sql.Date(sdf.parse("22/07/1996").getTime()));
+			st.setDouble(4, 3000.00);
+			st.setInt(5, 4);
 			
-			while(rs.next()){
-				System.out.println(rs.getInt("Id") + ", " + rs.getString("name")); //nesta row do resultSet, queremos o int da coluna Id e o String da coluna name
-			}
+			int rowsAffected = st.executeUpdate(); //quando vamos alterar dados, chamamos executeUpdate, resultado é um numero int indicando qyuantas linhas foram alteradas
+			
+			System.out.println("Success!! Rows affected: "+ rowsAffected);
 			
 		}
-		catch(SQLException e) {
+		catch (SQLException e) {
 			e.printStackTrace();
 		}
+		catch (ParseException e) {
+			e.printStackTrace();
+		}
+		
 		finally {
-			DB.closeRs(rs);
 			DB.closeSt(st);
 			DB.closeConnection();
 		}
-
 	}
 }
