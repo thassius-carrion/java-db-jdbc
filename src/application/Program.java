@@ -2,7 +2,9 @@ package application;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
@@ -24,7 +26,8 @@ public class Program {
 					"INSERT INTO seller "
 					+ "(Name, Email, BirthDate, BaseSalary, DepartmentId) "
 					+ "VALUES "
-					+ "(?, ?, ?, ?, ?)");
+					+ "(?, ?, ?, ?, ?)",
+					Statement.RETURN_GENERATED_KEYS);
 			
 			st.setString(1, "Karl Purple");
 			st.setString(2, "karl@gmail.com");
@@ -34,7 +37,16 @@ public class Program {
 			
 			int rowsAffected = st.executeUpdate(); //quando vamos alterar dados, chamamos executeUpdate, resultado é um numero int indicando qyuantas linhas foram alteradas
 			
-			System.out.println("Success!! Rows affected: "+ rowsAffected);
+			if(rowsAffected > 0) {
+				ResultSet rs = st.getGeneratedKeys();
+				while(rs.next()) {
+					int id = rs.getInt(1);
+					System.out.println("Done, Id = " + id);
+				}
+			}
+			else {
+				System.out.println("No rows affected.");
+			}
 			
 		}
 		catch (SQLException e) {
